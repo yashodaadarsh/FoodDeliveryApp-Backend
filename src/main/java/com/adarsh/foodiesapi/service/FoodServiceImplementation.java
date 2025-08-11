@@ -62,6 +62,53 @@ public class FoodServiceImplementation implements FoodService{
         return databaseEntries.stream().map( object -> convertToResponse(object) ).collect(Collectors.toList());
     }
 
+    @Override
+    public FoodResponse readFood( String id ) {
+        FoodEntity existingFood = foodRepository.findById( id ).orElseThrow( () -> new RuntimeException("Food not found for the id: " + id ) );
+        return convertToResponse(existingFood);
+    }
+
+    private String extractPublicIdFromUrl(String url) {
+        String path = url.substring(url.indexOf("/upload/") + 8);
+        // Remove version if present
+        if (path.startsWith("v") && path.length() > 2 && Character.isDigit(path.charAt(1))) {
+            path = path.substring(path.indexOf("/") + 1);
+        }
+        // Remove extension
+        int dotIndex = path.lastIndexOf(".");
+        if (dotIndex != -1) {
+            path = path.substring(0, dotIndex);
+        }
+        return path;
+    }
+
+
+    @Override
+    public boolean deleteFile(String publicId) {
+        try {
+            Map result = cloudinary.uploader().destroy(publicId, Map.of(
+                    "resource_type", "image" // auto detects image/video/raw
+            ));
+
+            // Cloudinary returns "result" : "ok" if deletion is successful
+            return "ok".equals(result.get("result"));
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while deleting the file");
+        }
+    }
+
+    @Override
+    public void deleteFood(String id) {
+        FoodResponse response = readFood(id);
+        String imageUrl = response.getImageUrl();
+        String publicId = extractPublicIdFromUrl(imageUrl);
+        boolean isFileDeleted = deleteFile(publicId);
+        if( isFileDeleted ){
+            //System.out.println("Deleted the file from cloudinary");
+            foodRepository.deleteById( id );
+        }
+    }
+
     private FoodEntity convertToEntity( FoodRequest request ){
         return FoodEntity
                 .builder()
@@ -82,6 +129,5 @@ public class FoodServiceImplementation implements FoodService{
                 .category(entity.getCategory())
                 .imageUrl(entity.getImageUrl())
                 .build();
-
     }
 }
