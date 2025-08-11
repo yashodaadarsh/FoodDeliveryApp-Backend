@@ -12,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -52,6 +54,12 @@ public class FoodServiceImplementation implements FoodService{
         newFoodEntity.setImageUrl(imageUrl);
         FoodEntity save = foodRepository.save(newFoodEntity);
         return convertToResponse(save);
+    }
+
+    @Override
+    public List<FoodResponse> readFoods() {
+        List<FoodEntity> databaseEntries = foodRepository.findAll();
+        return databaseEntries.stream().map( object -> convertToResponse(object) ).collect(Collectors.toList());
     }
 
     private FoodEntity convertToEntity( FoodRequest request ){

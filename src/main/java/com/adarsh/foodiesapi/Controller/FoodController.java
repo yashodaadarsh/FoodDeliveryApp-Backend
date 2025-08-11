@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,12 +24,8 @@ public class FoodController {
 
     private FoodService foodService;
 
-    @PostMapping("/upload")
-    public String uploadFile(@RequestParam("image") MultipartFile file){
-        return foodService.uploadFile(file);
-    }
 
-    @PostMapping("addFood")
+    @PostMapping
     public FoodResponse addFood( @RequestPart("food") String foodString , @RequestPart("image") MultipartFile file ){
         ObjectMapper mapper = new ObjectMapper();
         FoodRequest request = null;
@@ -43,4 +40,8 @@ public class FoodController {
         return response;
     }
 
+    @GetMapping
+    public List<FoodResponse> readFoods(){
+        return foodService.readFoods();
+    }
 }
