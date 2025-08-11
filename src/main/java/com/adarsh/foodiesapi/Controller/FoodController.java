@@ -28,7 +28,7 @@ public class FoodController {
         return foodService.uploadFile(file);
     }
 
-    @PostMapping()
+    @PostMapping("addFood")
     public FoodResponse addFood( @RequestPart("food") String foodString , @RequestPart("image") MultipartFile file ){
         ObjectMapper mapper = new ObjectMapper();
         FoodRequest request = null;
