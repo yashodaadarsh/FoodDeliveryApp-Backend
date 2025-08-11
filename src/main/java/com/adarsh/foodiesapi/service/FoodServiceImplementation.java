@@ -19,8 +19,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FoodServiceImplementation implements FoodService{
 
-    private final Cloudinary cloudinary;
-    private final FoodRepository foodRepository;
+    private Cloudinary cloudinary;
+    private FoodRepository foodRepository;
 
     @Override
     public String uploadFile(MultipartFile file) {
@@ -50,8 +50,8 @@ public class FoodServiceImplementation implements FoodService{
         FoodEntity newFoodEntity = convertToEntity(request);
         String imageUrl = uploadFile(file);
         newFoodEntity.setImageUrl(imageUrl);
-        newFoodEntity = foodRepository.save(newFoodEntity);
-        return convertToResponse(newFoodEntity);
+        FoodEntity save = foodRepository.save(newFoodEntity);
+        return convertToResponse(save);
     }
 
     private FoodEntity convertToEntity( FoodRequest request ){
