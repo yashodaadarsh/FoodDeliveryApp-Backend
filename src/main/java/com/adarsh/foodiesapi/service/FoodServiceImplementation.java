@@ -1,5 +1,9 @@
 package com.adarsh.foodiesapi.service;
 
+import com.adarsh.foodiesapi.Entity.FoodEntity;
+import com.adarsh.foodiesapi.Repository.FoodRepository;
+import com.adarsh.foodiesapi.io.FoodRequest;
+import com.adarsh.foodiesapi.io.FoodResponse;
 import com.cloudinary.Cloudinary;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +19,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FoodServiceImplementation implements FoodService{
 
-    private Cloudinary cloudinary;
+    private final Cloudinary cloudinary;
+    private final FoodRepository foodRepository;
 
     @Override
     public String uploadFile(MultipartFile file) {
@@ -38,5 +43,37 @@ public class FoodServiceImplementation implements FoodService{
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"An error occured while uploading the file");
         }
+    }
+
+    @Override
+    public FoodResponse addFood(FoodRequest request, MultipartFile file) {
+        FoodEntity newFoodEntity = convertToEntity(request);
+        String imageUrl = uploadFile(file);
+        newFoodEntity.setImageUrl(imageUrl);
+        newFoodEntity = foodRepository.save(newFoodEntity);
+        return convertToResponse(newFoodEntity);
+    }
+
+    private FoodEntity convertToEntity( FoodRequest request ){
+        return FoodEntity
+                .builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .category(request.getCategory())
+                .build();
+    }
+
+    private FoodResponse convertToResponse( FoodEntity entity ){
+        return FoodResponse
+                .builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .name(entity.getDescription())
+                .price(entity.getPrice())
+                .category(entity.getCategory())
+                .imageUrl(entity.getImageUrl())
+                .build();
+
     }
 }
