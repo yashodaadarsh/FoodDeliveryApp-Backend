@@ -14,7 +14,7 @@ public class FoodController {
     @Autowired
     private FoodServiceImplementation foodServiceImplementation;
     @PostMapping("/upload")
-    public Map uploadFile(@RequestParam("image") MultipartFile file){
+    public String uploadFile(@RequestParam("image") MultipartFile file){
         return foodServiceImplementation.uploadFile(file);
     }
 }

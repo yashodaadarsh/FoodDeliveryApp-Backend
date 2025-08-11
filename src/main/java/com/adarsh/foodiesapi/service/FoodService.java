@@ -5,5 +5,5 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 public interface FoodService {
-    Map uploadFile(MultipartFile file);
+    String uploadFile(MultipartFile file);
 }

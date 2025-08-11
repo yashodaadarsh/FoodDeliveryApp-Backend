@@ -18,7 +18,7 @@ public class FoodServiceImplementation implements FoodService{
     private Cloudinary cloudinary;
 
     @Override
-    public Map uploadFile(MultipartFile file) {
+    public String uploadFile(MultipartFile file) {
         String fileExtension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1);
         String key = UUID.randomUUID().toString();
         try {
@@ -28,7 +28,13 @@ public class FoodServiceImplementation implements FoodService{
                     "public_id", key
             ));
             System.out.println("uploaded");
-            return upload;
+            String url = upload.get("url").toString();
+            if( url != null ){
+                return url;
+            }
+            else{
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"File upload failed");
+            }
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"An error occured while uploading the file");
         }
