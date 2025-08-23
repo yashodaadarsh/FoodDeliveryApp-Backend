@@ -124,7 +124,7 @@ public class FoodServiceImplementation implements FoodService{
                 .builder()
                 .id(entity.getId())
                 .name(entity.getName())
-                .name(entity.getDescription())
+                .description(entity.getDescription())
                 .price(entity.getPrice())
                 .category(entity.getCategory())
                 .imageUrl(entity.getImageUrl())
